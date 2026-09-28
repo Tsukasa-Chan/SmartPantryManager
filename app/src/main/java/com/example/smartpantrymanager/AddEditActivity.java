@@ -1,5 +1,6 @@
 package com.example.smartpantrymanager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -24,8 +25,98 @@ import java.util.Calendar;
 public class AddEditActivity extends AppCompatActivity
         implements DatePickerDialog.SaveDateListener {
 
-    // The fixed list of units the user can pick from. Kept short on purpose,
-    // so the matching logic (built later) only has to handle these.
+    private void openActivity(Class activity){
+        Intent intent = new Intent(this,activity);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
+    private void initBackButton(){
+        Button btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v->{
+            openActivity(MainActivity.class);
+        });
+    }
+
+    private void initUnitSpinner() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                UNIT_OPTIONS
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerUnit.setAdapter(adapter);
+    }
+
+    private void initExpiryDateButton() {
+        Button btnExpiryDate = findViewById(R.id.btnExpiryDate);
+        btnExpiryDate.setOnClickListener(v -> {
+            FragmentManager fm = getSupportFragmentManager();
+            DatePickerDialog dialog = new DatePickerDialog();
+            dialog.show(fm, "DatePick");
+        });
+    }
+
+    @Override
+    public void didFinishDatePickerDialog(Calendar selectedDate) {
+        currentItem.setExpiryDate(selectedDate);
+        textExpiryDate.setText(DateFormat.format("dd MMM yyyy", selectedDate));
+    }
+
+    private void initSaveButton() {
+        Button btnSave = findViewById(R.id.btnSave);
+        btnSave.setOnClickListener(v -> {
+            if (isInputValid()) {
+                saveItemToDatabase();
+            }
+        });
+    }
+
+
+    private boolean isInputValid() {
+        String name = editName.getText().toString().trim();
+        String quantityText = editQuantity.getText().toString().trim();
+
+        if (name.isEmpty()) {
+            showError("Please enter an ingredient name");
+            return false;
+        }
+
+        if (quantityText.isEmpty()) {
+            showError("Please enter a quantity");
+            return false;
+        }
+
+        double quantity;
+        try {
+            quantity = Double.parseDouble(quantityText);
+        } catch (NumberFormatException e) {
+            showError("Quantity must be a number");
+            return false;
+        }
+
+        if (quantity <= 0) {
+            showError("Quantity must be greater than 0");
+            return false;
+        }
+
+        textError.setVisibility(View.GONE);
+
+        currentItem.setName(name);
+        currentItem.setQuantity(quantity);
+        currentItem.setUnit((String) spinnerUnit.getSelectedItem());
+
+        return true;
+    }
+
+    private void showError(String message) {
+        textError.setText(message);
+        textError.setVisibility(View.VISIBLE);
+    }
+
+    private void saveItemToDatabase() {
+        textError.setVisibility(View.GONE);
+    }
     private static final String[] UNIT_OPTIONS = {
             "g", "kg", "ml", "l", "tsp", "tbsp", "cup", "pcs"
     };
@@ -60,92 +151,8 @@ public class AddEditActivity extends AppCompatActivity
         initUnitSpinner();
         initExpiryDateButton();
         initSaveButton();
+        initBackButton();
     }
 
-    // A Spinner is a dropdown list. ArrayAdapter is what connects a plain
-    // array of Strings to it, the same way PantryAdapter connects a list of
-    // PantryItem objects to the RecyclerView.
-    private void initUnitSpinner() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_item,
-                UNIT_OPTIONS
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerUnit.setAdapter(adapter);
-    }
 
-    // Same DatePickerDialog fragment used in the class practical.
-    private void initExpiryDateButton() {
-        Button btnExpiryDate = findViewById(R.id.btnExpiryDate);
-        btnExpiryDate.setOnClickListener(v -> {
-            FragmentManager fm = getSupportFragmentManager();
-            DatePickerDialog dialog = new DatePickerDialog();
-            dialog.show(fm, "DatePick");
-        });
-    }
-
-    // Called by DatePickerDialog once the user picks a date.
-    @Override
-    public void didFinishDatePickerDialog(Calendar selectedDate) {
-        currentItem.setExpiryDate(selectedDate);
-        textExpiryDate.setText(DateFormat.format("dd MMM yyyy", selectedDate));
-    }
-
-    private void initSaveButton() {
-        Button btnSave = findViewById(R.id.btnSave);
-        btnSave.setOnClickListener(v -> {
-            if (isInputValid()) {
-                saveItemToDatabase();
-            }
-        });
-    }
-
-    // Checks the form before saving. Returns true only if everything is
-    // filled in correctly, and shows a message under the form if not.
-    private boolean isInputValid() {
-        String name = editName.getText().toString().trim();
-        String quantityText = editQuantity.getText().toString().trim();
-
-        if (name.isEmpty()) {
-            showError("Please enter an ingredient name");
-            return false;
-        }
-
-        if (quantityText.isEmpty()) {
-            showError("Please enter a quantity");
-            return false;
-        }
-
-        double quantity;
-        try {
-            quantity = Double.parseDouble(quantityText);
-        } catch (NumberFormatException e) {
-            showError("Quantity must be a number");
-            return false;
-        }
-
-        if (quantity <= 0) {
-            showError("Quantity must be greater than 0");
-            return false;
-        }
-
-        textError.setVisibility(View.GONE);
-
-        // Input is valid, so copy it into currentItem ready for saving
-        currentItem.setName(name);
-        currentItem.setQuantity(quantity);
-        currentItem.setUnit((String) spinnerUnit.getSelectedItem());
-
-        return true;
-    }
-
-    private void showError(String message) {
-        textError.setText(message);
-        textError.setVisibility(View.VISIBLE);
-    }
-
-    private void saveItemToDatabase() {
-        textError.setVisibility(View.GONE);
-    }
 }
