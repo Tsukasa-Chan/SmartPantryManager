@@ -5,15 +5,19 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smartpantrymanager.Models.PantryItem;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,6 +52,40 @@ public class MainActivity extends AppCompatActivity {
         btnNavSettings.setOnClickListener(v -> {
             openActivity(SettingsActivity.class);
         });
+    }
+
+    private void loadPantryList(){
+        PantryDataSource ds = new PantryDataSource(this);
+        ArrayList<PantryItem> pantryItems;
+
+        try{
+            ds.open();
+            pantryItems = ds.getAllItems();
+            ds.close();
+        }catch(Exception e){
+            pantryItems = new ArrayList<>();
+            Toast.makeText(this,"Error retrieving pantry items",
+                    Toast.LENGTH_LONG).show();
+        }
+
+        if(pantryItems.isEmpty()){
+            textEmptyPantry.setVisibility(View.VISIBLE);
+            recyclerPantryList.setVisibility(View.GONE);
+        }else{
+            textEmptyPantry.setVisibility(View.GONE);
+            recyclerPantryList.setVisibility(View.VISIBLE);
+
+            recyclerPantryList.setLayoutManager(new LinearLayoutManager(this));
+            PantryAdapter adapter = new PantryAdapter(pantryItems);
+            recyclerPantryList.setAdapter(adapter);
+        }
+
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        loadPantryList();
     }
 
     @Override
