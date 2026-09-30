@@ -1,5 +1,7 @@
 package com.example.smartpantrymanager;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -25,6 +27,22 @@ public class PantryAdapter extends RecyclerView.Adapter<PantryAdapter.PantryView
             itemNameTextView = itemView.findViewById(R.id.textItemName);
             itemQuantityTextView = itemView.findViewById(R.id.textItemQuantity);
             itemExpiryTextView = itemView.findViewById(R.id.textItemExpiry);
+
+            itemView.setOnClickListener(v->{
+                int position = getAdapterPosition();
+
+                if(position!=RecyclerView.NO_POSITION){
+                    PantryItem selectedItem = pantryItems.get(position);
+
+                    Context context = itemView.getContext();
+
+                    Intent intent = new Intent(context, AddEditActivity.class);
+                    intent.putExtra("itemId",selectedItem.getItemId());
+
+                    context.startActivity(intent);
+                }
+            });
+
         }
 
         public TextView getItemNameTextView() {

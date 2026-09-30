@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -63,6 +64,29 @@ public class AddEditActivity extends AppCompatActivity
         textExpiryDate.setText(DateFormat.format("dd MMM yyyy", selectedDate));
     }
 
+    private void saveItemToDatabase(){
+        PantryDataSource ds = new PantryDataSource(this);
+        boolean didSucceed;
+
+        try{
+            ds.open();
+            if(itemId == -1) {
+                didSucceed = ds.insertItem(currentItem);
+            }else{
+                didSucceed = ds.updateItem(currentItem);
+            }
+            ds.close();
+        }catch(Exception e){
+            didSucceed = false;
+        }
+
+        if(didSucceed){
+           finish();
+        }else{
+            Toast.makeText(this,"Could not save ingredient. Please try again", Toast.LENGTH_LONG).show();
+        }
+    }
+
     private void initSaveButton() {
         Button btnSave = findViewById(R.id.btnSave);
         btnSave.setOnClickListener(v -> {
@@ -109,20 +133,43 @@ public class AddEditActivity extends AppCompatActivity
         return true;
     }
 
+    private void loadItemData(){
+        editName.setText(currentItem.getName());
+
+        editQuantity.setText(String.valueOf(currentItem.getQuantity()));
+
+        int unitPosition = -1;
+
+        for(int i = 0; i < UNIT_OPTIONS.length;i++){
+            if(UNIT_OPTIONS[i].equals(currentItem.getUnit())){
+                unitPosition = i;
+                break;
+            }
+        }
+
+        if(unitPosition!=-1){
+            spinnerUnit.setSelection(unitPosition);
+        }
+
+        if(currentItem.getExpiryDate()!=null){
+            textExpiryDate.setText(DateFormat.format("dd MMM yyyy"
+            ,currentItem.getExpiryDate()));
+        }
+
+    }
+
     private void showError(String message) {
         textError.setText(message);
         textError.setVisibility(View.VISIBLE);
     }
 
-    private void saveItemToDatabase() {
-        textError.setVisibility(View.GONE);
-    }
     private static final String[] UNIT_OPTIONS = {
             "g", "kg", "ml", "l", "tsp", "tbsp", "cup", "pcs"
     };
 
     private PantryItem currentItem;
 
+    private int itemId;
     private EditText editName;
     private EditText editQuantity;
     private Spinner spinnerUnit;
@@ -140,7 +187,22 @@ public class AddEditActivity extends AppCompatActivity
             return insets;
         });
 
-        currentItem = new PantryItem();
+       Intent intent = getIntent();
+       itemId = intent.getIntExtra("itemId",-1);
+
+       if(itemId == -1){
+           currentItem = new PantryItem();
+       }else{
+           PantryDataSource ds = new PantryDataSource(this);
+
+           try{
+               ds.open();
+               currentItem = ds.getItem(itemId);
+               ds.close();
+           }catch(Exception e){
+               currentItem = new PantryItem();
+           }
+       }
 
         editName = findViewById(R.id.editName);
         editQuantity = findViewById(R.id.editQuantity);
@@ -152,6 +214,10 @@ public class AddEditActivity extends AppCompatActivity
         initExpiryDateButton();
         initSaveButton();
         initBackButton();
+
+        if(itemId != -1){
+            loadItemData();
+        }
     }
 
 
