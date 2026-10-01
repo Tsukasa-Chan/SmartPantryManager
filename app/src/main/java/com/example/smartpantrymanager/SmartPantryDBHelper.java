@@ -55,7 +55,7 @@ public class SmartPantryDBHelper extends SQLiteOpenHelper {
         ContentValues recipeValues = new ContentValues();
         recipeValues.put("name",name);
         recipeValues.put("steps",steps);
-        long recipeId = db.insert("recipe",null, recipeValues);
+        long recipeId = db.insert("recipes",null, recipeValues);
 
         for(Object[] ingredient:ingredients){
             ContentValues ingredientValues = new ContentValues();

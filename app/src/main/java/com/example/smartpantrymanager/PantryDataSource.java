@@ -86,11 +86,27 @@ public class PantryDataSource {
         return didSucceed;
     }
 
-    public ArrayList<PantryItem> getAllItems(){
+    public ArrayList<PantryItem> getAllItems(String sortField, String sortOrder){
         ArrayList<PantryItem> items = new ArrayList<>();
 
         try{
-            String query = "SELECT * FROM pantry_items";
+            String order;
+            if(sortOrder.equalsIgnoreCase("DESC")){
+                order = "DESC";
+            }else{
+                order = "ASC";
+            }
+
+            String orderBy;
+            if(sortField.equals("quantity")){
+                orderBy = "quantity " + order;
+            }else if(sortField.equals("expiry_date")){
+                orderBy = "expiry_date IS NULL, CAST(expiry_date AS INTEGER) " + order;
+            }else{
+                orderBy = "name COLLATE NOCASE " + order;
+            }
+
+            String query = "SELECT * FROM pantry_items ORDER BY " + orderBy;
             Cursor cursor = database.rawQuery(query,null);
 
             if(cursor.moveToFirst()){
@@ -116,6 +132,10 @@ public class PantryDataSource {
             //
         }
         return items;
+    }
+
+    public ArrayList<PantryItem> getAllItems(){
+        return getAllItems("name","ASC");
     }
 
     public PantryItem getItem(int itemId){

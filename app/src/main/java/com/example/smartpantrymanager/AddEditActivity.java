@@ -216,6 +216,8 @@ public class AddEditActivity extends AppCompatActivity
         initBackButton();
 
         if(itemId != -1){
+            TextView textTitle = findViewById(R.id.textTitle);
+            textTitle.setText("Edit Ingredient");
             loadItemData();
         }
     }

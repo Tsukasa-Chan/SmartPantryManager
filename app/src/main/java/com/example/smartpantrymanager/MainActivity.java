@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.Context;
+import android.content.SharedPreferences;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -55,12 +57,20 @@ public class MainActivity extends AppCompatActivity  implements  PantryAdapter.I
     }
 
     private void loadPantryList(){
+
+        SharedPreferences preferences = getSharedPreferences(
+                "SmartPantryPreferences",Context.MODE_PRIVATE
+        );
+
+        String sortField = preferences.getString("sortfield","name");
+        String sortOrder = preferences.getString("sortorder","ASC");
+
         PantryDataSource ds = new PantryDataSource(this);
         ArrayList<PantryItem> pantryItems;
 
         try{
             ds.open();
-            pantryItems = ds.getAllItems();
+            pantryItems = ds.getAllItems(sortField,sortOrder);
             ds.close();
         }catch(Exception e){
             pantryItems = new ArrayList<>();
