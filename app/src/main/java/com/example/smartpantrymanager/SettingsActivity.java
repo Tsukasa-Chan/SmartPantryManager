@@ -32,7 +32,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         btnNavRecipes.setOnClickListener(v->{
-            //
+            openActivity(SuggestedRecipesActivity.class);
         });
 
         btnNavSettings.setOnClickListener(v->{

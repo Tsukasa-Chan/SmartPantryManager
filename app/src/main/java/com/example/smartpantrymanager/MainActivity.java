@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity  implements  PantryAdapter.I
         });
 
         btnNavRecipes.setOnClickListener(v -> {
-            //
+            openActivity(SuggestedRecipesActivity.class);
         });
 
         btnNavSettings.setOnClickListener(v -> {
