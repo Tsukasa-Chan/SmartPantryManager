@@ -19,7 +19,7 @@ import com.example.smartpantrymanager.Models.PantryItem;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  implements  PantryAdapter.ItemDeleteListener{
 
     private RecyclerView recyclerPantryList;
     private TextView textEmptyPantry;
@@ -76,10 +76,15 @@ public class MainActivity extends AppCompatActivity {
             recyclerPantryList.setVisibility(View.VISIBLE);
 
             recyclerPantryList.setLayoutManager(new LinearLayoutManager(this));
-            PantryAdapter adapter = new PantryAdapter(pantryItems);
+            PantryAdapter adapter = new PantryAdapter(pantryItems,this);
             recyclerPantryList.setAdapter(adapter);
         }
 
+    }
+
+    @Override
+    public void onItemDeleted(){
+        loadPantryList();
     }
 
     @Override

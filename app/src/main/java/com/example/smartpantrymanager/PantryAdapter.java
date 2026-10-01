@@ -7,6 +7,9 @@ import android.text.format.DateFormat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.ImageButton;
+import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +19,12 @@ import com.example.smartpantrymanager.Models.PantryItem;
 import java.util.ArrayList;
 public class PantryAdapter extends RecyclerView.Adapter<PantryAdapter.PantryViewHolder> {
     private ArrayList<PantryItem> pantryItems;
+
+    public interface ItemDeleteListener{
+        void onItemDeleted();
+    }
+
+    private ItemDeleteListener deleteListener;
 
     public class PantryViewHolder extends RecyclerView.ViewHolder {
         private TextView itemNameTextView;
@@ -43,6 +52,16 @@ public class PantryAdapter extends RecyclerView.Adapter<PantryAdapter.PantryView
                 }
             });
 
+            ImageButton btnDeleteItem = itemView.findViewById(R.id.btnDeleteItem);
+            btnDeleteItem.setOnClickListener(v->{
+                int position = getAdapterPosition();
+
+                if(position != RecyclerView.NO_POSITION){
+                    PantryItem selectedItem = pantryItems.get(position);
+                    confirmDelete(itemView.getContext(),selectedItem);
+                }
+            });
+
         }
 
         public TextView getItemNameTextView() {
@@ -59,9 +78,40 @@ public class PantryAdapter extends RecyclerView.Adapter<PantryAdapter.PantryView
 
     }
 
-        public PantryAdapter(ArrayList<PantryItem> items){
+        public PantryAdapter(ArrayList<PantryItem> items, ItemDeleteListener listener){
             pantryItems = items;
+            deleteListener = listener;
         }
+
+    private void confirmDelete(Context context, PantryItem item){
+        new AlertDialog.Builder(context)
+                .setTitle("Delete ingredient")
+                .setMessage("Are you sure you want to delete " + item.getName() + "?")
+                .setPositiveButton("Delete", (dialog, which) -> deleteItemFromDatabase(context, item))
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void deleteItemFromDatabase(Context context, PantryItem item){
+        PantryDataSource ds = new PantryDataSource(context);
+        boolean didSucceed;
+
+        try{
+            ds.open();
+            didSucceed = ds.deleteItem(item.getItemId());
+            ds.close();
+        }catch(Exception e){
+            didSucceed = false;
+        }
+
+        if(didSucceed){
+            Toast.makeText(context,"Ingredient deleted",Toast.LENGTH_SHORT).show();
+            deleteListener.onItemDeleted();
+        }else{
+            Toast.makeText(context,"Could not delete ingredient. Please try again",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
 
         @NonNull
         @Override
