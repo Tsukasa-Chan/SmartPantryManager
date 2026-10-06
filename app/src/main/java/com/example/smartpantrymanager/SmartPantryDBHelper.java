@@ -5,10 +5,14 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+// Creates the SQLite database and its tables when the app is first run
 public class SmartPantryDBHelper extends SQLiteOpenHelper {
+    // name of the database file on the phone
     private static final String DATABASE_NAME = "smartpantry.db";
+    // version of the database
     private static final int DATABASE_VERSION = 1;
 
+    // first table which is the items the user has in their pantry
     private static final String CREATE_TABLE_PANTRY_ITEMS =
             "CREATE TABLE pantry_items("+
                     "_id INTEGER PRIMARY KEY AUTOINCREMENT,"+
@@ -17,12 +21,14 @@ public class SmartPantryDBHelper extends SQLiteOpenHelper {
                     "unit TEXT NOT NULL,"+
                     "expiry_date TEXT)";
 
+    // second table which has the recipes
     private static final String CREATE_TABLE_RECIPES =
             "CREATE TABLE recipes("+
                     "_id INTEGER PRIMARY KEY AUTOINCREMENT,"+
                     "name TEXT NOT NULL,"+
                     "steps TEXT NOT NULL)";
 
+    // third table which has the ingredients for each recipe
     private static final String CREATE_TABLE_RECIPE_INGREDIENTS =
             "CREATE TABLE recipe_ingredients("+
                     "_id INTEGER PRIMARY KEY AUTOINCREMENT,"+
@@ -31,10 +37,13 @@ public class SmartPantryDBHelper extends SQLiteOpenHelper {
                     "quantity REAL NOT NULL,"+
                     "unit TEXT NOT NULL)";
 
+    // constructor that passes the database name and version to SQLiteOpenHelper
     public SmartPantryDBHelper(Context context){
         super(context,DATABASE_NAME,null,DATABASE_VERSION);
     }
 
+    // run once when the database is first created and creates the three tables
+    // also adds the recipes
     @Override
     public void onCreate(SQLiteDatabase db){
         db.execSQL(CREATE_TABLE_PANTRY_ITEMS);
@@ -43,6 +52,8 @@ public class SmartPantryDBHelper extends SQLiteOpenHelper {
         seedRecipes(db);
     }
 
+    // runs when the database version is increased
+    // it deletes the old tables and makes them again
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
         db.execSQL("DROP TABLE IF EXISTS pantry_items");
@@ -51,6 +62,7 @@ public class SmartPantryDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    // adds a recipe and its ingredients to the database
     private void insertRecipe(SQLiteDatabase db, String name, String steps, Object[][] ingredients){
         ContentValues recipeValues = new ContentValues();
         recipeValues.put("name",name);
@@ -67,6 +79,7 @@ public class SmartPantryDBHelper extends SQLiteOpenHelper {
         }
     }
 
+    // add the starting recipes to the database
     private void seedRecipes(SQLiteDatabase db){
 
         insertRecipe(db, "Tomato and Egg Stir Fry",

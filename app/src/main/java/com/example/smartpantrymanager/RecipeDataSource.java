@@ -48,7 +48,7 @@ public class RecipeDataSource {
             }
             cursor.close();
         }catch(Exception e){
-            //
+            // empty list is returned. so the screen shows the empty message
         }
         return recipes;
     }
@@ -69,7 +69,7 @@ public class RecipeDataSource {
             }
             cursor.close();
         }catch(Exception e){
-            //
+            // empty recipe is returned, so the detail screen closes
         }
         return recipe;
     }
@@ -96,7 +96,7 @@ public class RecipeDataSource {
             }
             cursor.close();
         }catch(Exception e){
-            //
+            // empty list is returned
         }
         return ingredients;
     }

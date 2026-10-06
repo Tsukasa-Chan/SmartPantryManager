@@ -1,21 +1,30 @@
 package com.example.smartpantrymanager.Models;
 
+// class for one ingredient that a recipe needs for example 1 tbsp of milk
+// only holds the data
 public class RecipeIngredient{
+    // id of the ingredient
     private int ingredientId;
 
+    // id of the recipe
     private int recipeId;
 
+    // name of the ingredient
     private String ingredientName;
 
+    // quantity of the ingredient
     private double quantity;
 
+    // the unit for the quantity, example g or kg
     private String unit;
 
+    // both the ids will start at -1 because it not in the database
     public RecipeIngredient(){
         ingredientId = -1;
         recipeId = -1;
     }
 
+    // set up an ingredient with its name, quantity and units already
     public RecipeIngredient(String ingredientName, double quantity, String unit){
         this();
         this.ingredientName = ingredientName;
@@ -23,6 +32,7 @@ public class RecipeIngredient{
         this.unit = unit;
     }
 
+    // getters and setters, these let other classes read and change the fields
     public int getIngredientId() {
         return ingredientId;
     }

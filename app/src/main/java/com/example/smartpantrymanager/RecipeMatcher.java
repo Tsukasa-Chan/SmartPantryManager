@@ -63,8 +63,8 @@ public class RecipeMatcher {
         return availableAmount >= neededAmount - 0.0001;
     }
 
-    // Lowercase, trim and remove a plural ending so "Eggs" matches "egg"
-    // and "Tomatoes" matches "tomato"
+    // Lowercase, trim and remove a plural ending so Eggs matches egg
+    // and Tomatoes matches tomato
     private String cleanName(String name){
         if(name == null){
             return "";
@@ -80,8 +80,8 @@ public class RecipeMatcher {
         return cleaned;
     }
 
-    // g and kg are both "mass", ml, l, tsp, tbsp and cup are all "volume".
-    // Anything else (like pcs) only matches the same unit.
+    // g and kg are both mass, ml, l, tsp, tbsp and cup are all volume
+    // Anything else only matches the same unit.
     private String getUnitFamily(String unit){
         if(unit == null){
             return "";
