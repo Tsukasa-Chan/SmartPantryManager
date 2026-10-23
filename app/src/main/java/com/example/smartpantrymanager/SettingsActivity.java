@@ -16,12 +16,14 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class SettingsActivity extends AppCompatActivity {
 
+    // method to open another activity in the app
     private void openActivity(Class activity){
         Intent intent = new Intent(this,activity);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
 
+    // sets up the navigation buttons
     private void initNavButtons(){
         Button btnNavPantry = findViewById(R.id.btnNavPantry);
         Button btnNavRecipes = findViewById(R.id.btnNavRecipes);
@@ -36,11 +38,12 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         btnNavSettings.setOnClickListener(v->{
-            //
+            // user is already on the settings page
         });
     }
 
 
+    // load the saved sorting settings when the page opens
     private void initSettings(){
         SharedPreferences preferences = getSharedPreferences(
                 "SmartPantryPreferences", Context.MODE_PRIVATE);
@@ -52,6 +55,7 @@ public class SettingsActivity extends AppCompatActivity {
         RadioButton rbExpiry = findViewById(R.id.radioExpiry);
         RadioButton rbQuantity = findViewById(R.id.radioQuantity);
 
+        // selects the saved fields used to sort pantry items
         if(sortBy.equalsIgnoreCase("name")){
             rbName.setChecked(true);
         }else if(sortBy.equalsIgnoreCase("expiry_date")){
@@ -63,6 +67,7 @@ public class SettingsActivity extends AppCompatActivity {
         RadioButton rbASC = findViewById(R.id.radioAscending);
         RadioButton rbDSC = findViewById(R.id.radioDescending);
 
+        // selects the saved sorting order
         if(sortOrder.equalsIgnoreCase("ASC")){
             rbASC.setChecked(true);
         }else{
@@ -71,6 +76,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
+    // saves the selected sorting field
     private void initSortByClick(){
         RadioGroup sortByGroup = findViewById(R.id.radioGroupSortBy);
 
@@ -90,6 +96,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
+    // saves whether items should be sorted in ascending or descending order
     private void initSortOrderClick(){
         RadioGroup sortOrderGroup = findViewById(R.id.radioGroupSortOrder);
 
@@ -119,6 +126,7 @@ public class SettingsActivity extends AppCompatActivity {
             return insets;
         });
 
+        // sets up the settings page
         initNavButtons();
         initSettings();
         initSortByClick();
